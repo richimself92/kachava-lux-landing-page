@@ -1,0 +1,87 @@
+{
+  "entities": {
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Luxury package reservation inquiry for Kachava Lux in Tulum",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100,
+          "description": "Full name of the requesting guest"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 120,
+          "description": "Contact email address"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 40,
+          "description": "Guest phone or WhatsApp number"
+        },
+        "arrivalDate": {
+          "type": "string",
+          "format": "date",
+          "minLength": 10,
+          "maxLength": 20,
+          "description": "Preferred arrival date (YYYY-MM-DD)"
+        },
+        "guestCount": {
+          "type": "number",
+          "description": "Number of guests (1-12)"
+        },
+        "experienceChoice": {
+          "type": "string",
+          "enum": ["golf", "massage"],
+          "description": "Selected experience: two rounds of golf at PGA Riviera Maya or two massage sessions"
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Optional notes or special requests"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["new", "contacted", "reserved", "archived"],
+          "description": "Status of the inquiry"
+        },
+        "packagePrice": {
+          "type": "number",
+          "description": "Package price in USD ($3,950)"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code (USD)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when inquiry was submitted"
+        }
+      },
+      "required": [
+        "fullName",
+        "email",
+        "arrivalDate",
+        "guestCount",
+        "experienceChoice",
+        "status",
+        "packagePrice",
+        "currency",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/inquiries/{inquiryId}": {
+      "schema": {
+        "$ref": "#/entities/Inquiry"
+      },
+      "description": "Guest inquiries for the Kachava Lux limited-time package"
+    }
+  }
+}

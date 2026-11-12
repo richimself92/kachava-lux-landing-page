@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email == "ricardo.ferrergz@gmail.com" && request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['fullName', 'email', 'arrivalDate', 'guestCount', 'experienceChoice', 'status', 'packagePrice', 'currency', 'createdAt']) &&
+        data.keys().hasOnly(['fullName', 'email', 'phone', 'arrivalDate', 'guestCount', 'experienceChoice', 'notes', 'status', 'packagePrice', 'currency', 'createdAt']) &&
+        data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 100 &&
+        data.email is string && data.email.size() >= 5 && data.email.size() <= 120 &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 40)) &&
+        data.arrivalDate is string && data.arrivalDate.size() >= 8 && data.arrivalDate.size() <= 20 &&
+        data.guestCount is number && data.guestCount >= 1 && data.guestCount <= 12 &&
+        (data.experienceChoice == 'golf' || data.experienceChoice == 'massage') &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 2000)) &&
+        (data.status in ['new', 'contacted', 'reserved', 'archived']) &&
+        data.packagePrice is number && data.packagePrice == 3950 &&
+        data.currency is string && data.currency == 'USD' &&
+        data.createdAt is string && data.createdAt.size() <= 40;
+    }
+
+    match /inquiries/{inquiryId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(inquiryId) && isValidInquiry(incoming()) && incoming().status == 'new';
+      allow update: if isValidId(inquiryId) && isAdmin() && isValidInquiry(incoming());
+      allow delete: if isValidId(inquiryId) && isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+}

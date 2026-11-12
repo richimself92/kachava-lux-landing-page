@@ -1,0 +1,8 @@
+{
+  "name": "Kachava Lux Tulum | Private Residences & Spa",
+  "description": "Exclusive limited-time luxury getaway in Tulum, Mexico: 4-night private villa stay, private yacht charter, in-villa gourmet breakfast, VIP airport transfers, and choice of PGA Riviera Maya golf or signature massage sessions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
